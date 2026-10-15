@@ -1,7 +1,14 @@
 <!doctype html><html lang="zh-CN"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0b0b0f"><title>蓝V星图 · 中文 X 博主导航</title>
-<link rel="stylesheet" href="style.css?v=20261015235205"></head><body>
+<meta name="theme-color" content="#0b0b0f"><title>蓝V星图 · 中文 X 认证博主导航与涨速榜</title>
+<meta name="description" content="收录 6000+ 位中文社区 X 蓝V博主：按 AI、币圈、出海、搞钱等方向筛选，附内容涨速榜与涨粉榜，点击直达 X 主页。">
+<meta property="og:type" content="website"><meta property="og:site_name" content="蓝V星图"><meta property="og:title" content="蓝V星图 · 中文 X 认证博主导航">
+<meta property="og:description" content="6000+ 中文蓝V博主按方向筛选，内容涨速榜、涨粉榜，一键直达 X 主页。"><meta property="og:url" content="https://pei-only.github.io/bluev-star/">
+<meta property="og:image" content="https://pei-only.github.io/bluev-star/og.png"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:image" content="https://pei-only.github.io/bluev-star/og.png">
+<link rel="icon" href="favicon.svg" type="image/svg+xml"><link rel="apple-touch-icon" href="icon-180.png"><link rel="canonical" href="https://pei-only.github.io/bluev-star/">
+<link rel="preconnect" href="https://pbs.twimg.com"><meta name="live" content="data/live.js?v=20261016004048">
+<link rel="stylesheet" href="style.css?v=20261016004048"></head><body>
 <div class="bg"><i></i><i></i></div>
 <header class="top"><div class="wrap tb">
  <a class="logo" href="#dir"><span class="mk"></span>蓝V星图</a>
@@ -9,17 +16,17 @@
  <button id="theme" class="ic" aria-label="切换主题"></button></div></header>
 <main class="wrap">
 <section id="p-dir">
- <div class="hero"><p class="eyebrow">中文社区 · X 认证博主</p><h1>关注你真正想看的内容</h1><p class="sub" id="stat"></p>
-  <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" placeholder="搜索名称、@账号、简介或标签" autocomplete="off"><kbd>/</kbd></div></div>
+ <div class="hero"><p class="eyebrow">中文社区 · X 认证博主</p><h1>关注你真正想看的内容</h1><p class="sub" id="stat"></p><p class="upd" id="updh"></p>
+  <div class="search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input id="q" type="search" aria-label="搜索博主" enterkeyhint="search" placeholder="搜索名称、@账号、简介或标签" autocomplete="off"><kbd>/</kbd></div></div>
  <div class="picks" id="picksWrap"><div class="sh"><h2>新手推荐</h2><span>从这几位开始关注</span></div><div class="rail" id="picks"></div></div>
  <div class="filters"><div class="chips" id="chips"></div>
-  <div class="row2"><div class="seg sm" id="vt"></div><select id="sort"><option value="f">粉丝最多</option><option value="fa">粉丝最少</option><option value="n">按名称</option></select></div></div>
+  <div class="row2"><div class="seg sm" id="vt"></div><select id="sort" aria-label="排序方式"><option value="f">粉丝最多</option><option value="fa">粉丝最少</option><option value="n">按名称</option></select></div></div>
  <p class="count" id="cnt"></p><div class="grid" id="list"></div><div id="sentinel"></div>
 </section>
 <section id="p-growth" hidden><div class="hero sm"><p class="eyebrow">Follower Growth</p><h1>涨粉榜</h1><p class="sub">按每日粉丝快照对比，统计周期内净增粉丝最多的博主</p></div>
- <div class="seg" id="gtabs"></div><div id="gbody" class="board"></div></section>
+ <div class="seg" id="gtabs"></div><p class="cap" id="gcap"></p><div id="gbody" class="board"></div></section>
 <section id="p-velocity" hidden><div class="hero sm"><p class="eyebrow">Content Velocity</p><h1>内容涨速榜</h1><p class="sub">每半小时采样一次，看哪些帖子正在快速升温</p></div>
- <div class="row2"><div class="seg" id="vtabs"></div><div class="seg sm" id="vm"></div></div><div id="vbody" class="board"></div></section>
+ <div class="row2"><div class="seg" id="vtabs"></div><div class="seg sm" id="vm"></div></div><p class="cap" id="vcap"></p><div id="vbody" class="board"></div></section>
 </main>
 <footer class="wrap"><p>数据来自 X 公开资料，定时自动抓取。名单通过检索收集，未必完整；人设与标签为自动归纳，仅供参考。“约”表示数值不确定。</p><p>更新于 <span id="upd"></span>（北京时间）</p></footer>
-<script src="data/bundle.js?v=20261015235205"></script><script src="app.js?v=20261015235205"></script></body></html>
+<script defer src="data/bundle.js?v=20261016004048"></script><script defer src="app.js?v=20261016004048"></script></body></html>
