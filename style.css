@@ -73,3 +73,4 @@ footer{padding:36px 20px 60px;color:var(--mut);font-size:12.5px;text-align:cente
 @media (max-width:640px){.row2 .seg#vtabs{flex:1 1 100%}#p-velocity .row2{flex-wrap:wrap}}
 .cap{color:var(--mut);font-size:12.5px;margin:14px 2px -6px}
 @media (max-width:640px){.hero{padding:26px 0 10px}.hero h1{font-size:28px;margin:6px 0 8px}.sub{font-size:13.5px}.search{margin-top:18px}.sh{margin:18px 0 10px}}
+.nch{margin-top:14px}

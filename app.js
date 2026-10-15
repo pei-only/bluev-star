@@ -44,19 +44,24 @@ if(P.length)$('#picks').innerHTML=P.map(a=>`<a class="pk" href="${prof(a.handle)
 const go=u=>window.open(u,'_blank','noopener');
 document.addEventListener('click',e=>{const p=e.target.closest('[data-prof]');if(p){e.preventDefault();e.stopPropagation();go(prof(p.dataset.prof));return}const r=e.target.closest('[data-href]');if(r)go(r.dataset.href)});
 const pending=(t,m,pct)=>`<div class="empty"><div class="orb"></div><h3>${t}</h3><p>${m}</p>${pct!=null?`<div class="bar"><i style="width:${Math.max(4,Math.min(100,pct))}%"></i></div>`:''}</div>`;
-let gk='3d',vk='30m',vm='views';const setQ=(p,o)=>history.replaceState(null,'','#'+p+'?'+new URLSearchParams(o));
+let gk='3d',vk='30m',vm='views';const NS={growth:new Set(),velocity:new Set()};
+function nchips(el,kind,rows,cb){const c={};(rows||[]).forEach(r=>{const n=r.niche||'其他';c[n]=(c[n]||0)+1});const S=NS[kind];const ks=Object.keys(c).sort((a,b)=>c[b]-c[a]);
+ el.innerHTML=`<button class="${S.size?'':'on'}" data-k="">全部</button>`+ks.map(k=>`<button class="${S.has(k)?'on':''}" data-k="${esc(k)}" aria-pressed="${S.has(k)}">${esc(k)}<small>${c[k]}</small></button>`).join('');
+ el.onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;if(!k)S.clear();else S.has(k)?S.delete(k):S.add(k);cb()}}
+const nf=(kind,b)=>NS[kind].size?b.filter(r=>NS[kind].has(r.niche||'其他')):b;const setQ=(p,o)=>history.replaceState(null,'','#'+p+'?'+new URLSearchParams(o));
 let liveP;function live(){return liveP||(liveP=new Promise(r=>{const sc=document.createElement('script');sc.src=document.querySelector('meta[name=live]').content;sc.onload=()=>{D.velocity=window.LIVE.velocity;r()};document.head.append(sc)}))}
 function growth(){seg($('#gtabs'),['3d','5d','10d','15d','30d'].map(k=>[k,k.replace('d',' 日')]),gk,k=>{gk=k;setQ('growth',{d:gk});growth()});
  const b=D.growth.boards?.[gk],d=parseInt(gk);
  if(!b||!b.length){const f=D.growth.first?new Date(D.growth.first):null,el=f?(Date.now()-f)/864e5:0,left=Math.max(1,Math.ceil(d-el));
-  $('#gcap').textContent='每晚 21:16 记录一次粉丝数，按周期内净增粉丝排序';$('#gbody').innerHTML=pending('数据积累中',`${d} 日涨粉榜需要连续 ${d} 天的粉丝快照，预计 ${left} 天后上线`+(f?`（约 ${new Date(+f+d*864e5).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} 晚间）`:'')+(f?`<br>首次快照：${f.toLocaleDateString('zh-CN')}`:''),el/d*100);return}
- $('#gbody').innerHTML=b.map((r,i)=>`<div class="lr" data-href="${prof(r.handle)}"><span class="rk ${i<3?'t':''}">${i+1}</span>${av(r,'s')}<div class="mid"><div class="nm">${esc(r.name||r.handle)}</div><div class="hl">@${esc(r.handle)} · ${esc(r.niche||'')} · ${fmt(r.followers)} 粉丝</div></div><div class="num"><b>+${fmt(r.gain)}</b><small>${r.pct!=null?r.pct+'%':''}</small></div></div>`).join('')}
+  $('#gn').innerHTML='';$('#gcap').textContent='每晚 21:16 记录一次粉丝数，按周期内净增粉丝排序';$('#gbody').innerHTML=pending('数据积累中',`${d} 日涨粉榜需要连续 ${d} 天的粉丝快照，预计 ${left} 天后上线`+(f?`（约 ${new Date(+f+d*864e5).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} 晚间）`:'')+(f?`<br>首次快照：${f.toLocaleDateString('zh-CN')}`:''),el/d*100);return}
+ nchips($('#gn'),'growth',b,growth);const bf=nf('growth',b);
+ $('#gbody').innerHTML=bf.length?'':pending('该方向暂无上榜博主','换个方向或选“全部”');if(bf.length)$('#gbody').innerHTML=bf.map((r,i)=>`<div class="lr" data-href="${prof(r.handle)}"><span class="rk ${i<3?'t':''}">${i+1}</span>${av(r,'s')}<div class="mid"><div class="nm">${esc(r.name||r.handle)}</div><div class="hl">@${esc(r.handle)} · ${esc(r.niche||'')} · ${fmt(r.followers)} 粉丝</div></div><div class="num"><b>+${fmt(r.gain)}</b><small>${r.pct!=null?r.pct+'%':''}</small></div></div>`).join('')}
 function velocity(){if(!window.LIVE){$('#vbody').innerHTML=pending('加载中…','正在读取最新采样');live().then(velocity);return}seg($('#vtabs'),[['30m','30 分钟'],['1h','1 小时'],['3h','3 小时'],['5h','5 小时']],vk,k=>{vk=k;setQ('velocity',{w:vk,m:vm});velocity()});
  seg($('#vm'),[['views','浏览'],['likes','点赞']],vm,k=>{vm=k;setQ('velocity',{w:vk,m:vm});velocity()});
  let b=D.velocity.boards?.[vk];const mins={'30m':30,'1h':60,'3h':180,'5h':300}[vk];
  if(!b||!b.length){const f=D.velocity.first?new Date(D.velocity.first):null,el=f?(Date.now()-f)/6e4:0,left=Math.max(30,mins-el),lab=left>=60?Math.ceil(left/60)+' 小时':Math.ceil(left)+' 分钟';
   $('#vbody').innerHTML=pending('数据积累中',`需要至少 ${mins>=60?mins/60+' 小时':mins+' 分钟'}的连续采样（每天 9:00–24:00 每半小时一次），预计约 ${lab}采样时段后上线`,el/mins*100);return}
- const k=vm=='views'?'dviews':'dlikes';b=[...b].sort((x,y)=>y[k]-x[k]);
+ nchips($('#vn'),'velocity',b,velocity);const k=vm=='views'?'dviews':'dlikes';b=nf('velocity',[...b]).sort((x,y)=>y[k]-x[k]);if(!b.length){$('#vbody').innerHTML=pending('该方向暂无上榜内容','换个方向或选“全部”');return}
  const lt=D.velocity.latest?new Date(D.velocity.latest).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'';
  $('#vcap').textContent=`按近 ${{'30m':'30 分钟','1h':'1 小时','3h':'3 小时','5h':'5 小时'}[vk]}新增${vm=='views'?'浏览':'点赞'}排序 · 最近采样 ${lt}（北京时间）· 点击帖子看原文，点击头像进主页`;
  $('#vbody').innerHTML=b.map((r,i)=>`<div class="lr post" data-href="https://x.com/${encodeURIComponent(r.handle)}/status/${esc(r.id)}" title="打开原帖" role="link" tabindex="0">
