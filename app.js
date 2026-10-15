@@ -19,7 +19,8 @@ $('#upd').textContent=D.meta.updated_at;
 const nAv=D.accounts.filter(a=>a.avatar).length;
 $('#stat').textContent=`已收录 ${D.meta.count.toLocaleString()} 位中文认证博主 · ${D.meta.niches.length} 个方向 · 点击任一博主直达 X 主页`;
 // segmented helper
-function seg(el,items,cur,cb){el.innerHTML=items.map(([k,l,c])=>`<button class="${k==cur?'on':''}" data-k="${esc(k)}">${esc(l)}${c!=null?`<small>${c}</small>`:''}</button>`).join('');el.onclick=e=>{const b=e.target.closest('button');if(b)cb(b.dataset.k)}}
+const EMO={'技术AI':'🤖','Web3币圈':'🪙','财经宏观':'📈','创业出海':'🚀','其他':'✨','搞钱路子':'💰','新闻快讯搬运':'📰','时政评论':'🏛️','设计审美':'🎨','搞笑meme':'😂','卖服务私域':'🤝','读书知识':'📚','留学移民':'✈️','薅羊毛':'🐑','情感婚恋':'💞','科技数码':'📱','玄学星座':'🔮','职场':'💼','美女擦边':'💃','宠物':'🐱','生活日常':'☕','游戏动漫':'🎮','海外生活':'🌏','健身运动':'🏃','心理成长':'🌱','旅行':'🧳','育儿教育':'🧸','影视音乐':'🎬','美食':'🍜','摄影':'📷','房产':'🏠','汽车':'🚗','健康养生':'🍵','全部':'🌐'};const em=k=>EMO[k]?`<i class="e">${EMO[k]}</i>`:'';
+function seg(el,items,cur,cb){const E=el.classList.contains('chips');el.innerHTML=items.map(([k,l,c])=>`<button class="${k==cur?'on':''}" data-k="${esc(k)}">${E?em(k):''}${esc(l)}${c!=null?`<small>${c}</small>`:''}</button>`).join('');el.onclick=e=>{const b=e.target.closest('button');if(b)cb(b.dataset.k)}}
 // ---------- directory
 const P=D.accounts.filter(a=>a.pick).sort((a,b)=>(b.followers||0)-(a.followers||0));
 let st={niche:'全部',q:'',sort:'f',vt:'全部',n:0};let L=[];
@@ -32,7 +33,7 @@ let ready=0;function syncURL(){if(!ready)return;const u=new URLSearchParams();if
 function filt(){syncURL();if(P.length)$('#picksWrap').hidden=!!(st.q.trim()||st.niche!='全部'||st.vt!='全部');requestAnimationFrame(()=>document.querySelector('#chips .on')?.scrollIntoView({inline:'center',block:'nearest'}));const q=st.q.trim().toLowerCase().replace(/^@/,'');const qs=q.split(/\s+/).filter(Boolean);
  L=D.accounts.filter(a=>(st.niche=='全部'||a.niche==st.niche)&&(st.vt=='全部'||a._v==st.vt)&&qs.every(w=>a._s.includes(w)));
  if(st.sort=='fa')L.sort((a,b)=>(a.followers||0)-(b.followers||0));else if(st.sort=='n')L.sort((a,b)=>(a.name||a.handle).localeCompare(b.name||b.handle,'zh'));else L.sort((a,b)=>(b.followers||0)-(a.followers||0));
- $('#cnt').textContent=`共 ${L.length.toLocaleString()} 位博主`;$('#list').innerHTML=L.length?'':`<div class="empty" style="grid-column:1/-1"><div class="orb"></div><h3>没有找到匹配的博主</h3><p>换个关键词，或清除筛选再试试</p></div>`;st.n=0;more()}
+ $('#cnt').innerHTML=`共 <b>${L.length.toLocaleString()}</b> 位博主`;$('#list').innerHTML=L.length?'':`<div class="empty" style="grid-column:1/-1"><div class="orb"></div><h3>没有找到匹配的博主</h3><p>换个关键词，或清除筛选再试试</p></div>`;st.n=0;more()}
 function more(){if(st.n>=L.length)return;$('#list').insertAdjacentHTML('beforeend',L.slice(st.n,st.n+48).map(card).join(''));st.n+=48}
 new IntersectionObserver(e=>{if(e[0].isIntersecting)more()},{rootMargin:'800px'}).observe($('#sentinel'));
 function chips(){const c=[['全部','全部',D.accounts.length],...D.meta.niches.map(([k,n])=>[k,k,n])];seg($('#chips'),c,st.niche,k=>{st.niche=k;chips();filt()})}
@@ -46,15 +47,15 @@ document.addEventListener('click',e=>{const p=e.target.closest('[data-prof]');if
 const pending=(t,m,pct)=>`<div class="empty"><div class="orb"></div><h3>${t}</h3><p>${m}</p>${pct!=null?`<div class="bar"><i style="width:${Math.max(4,Math.min(100,pct))}%"></i></div>`:''}</div>`;
 let gk='3d',vk='30m',vm='views';const NS={growth:new Set(),velocity:new Set()};
 function nchips(el,kind,rows,cb){const c={};(rows||[]).forEach(r=>{const n=r.niche||'其他';c[n]=(c[n]||0)+1});const S=NS[kind];const ks=Object.keys(c).sort((a,b)=>c[b]-c[a]);
- el.innerHTML=`<button class="${S.size?'':'on'}" data-k="">全部</button>`+ks.map(k=>`<button class="${S.has(k)?'on':''}" data-k="${esc(k)}" aria-pressed="${S.has(k)}">${esc(k)}<small>${c[k]}</small></button>`).join('');
+ el.innerHTML=`<button class="${S.size?'':'on'}" data-k="">${em('全部')}全部</button>`+ks.map(k=>`<button class="${S.has(k)?'on':''}" data-k="${esc(k)}" aria-pressed="${S.has(k)}">${em(k)}${esc(k)}<small>${c[k]}</small></button>`).join('');
  el.onclick=e=>{const b=e.target.closest('button');if(!b)return;const k=b.dataset.k;if(!k)S.clear();else S.has(k)?S.delete(k):S.add(k);cb()}}
 const nf=(kind,b)=>NS[kind].size?b.filter(r=>NS[kind].has(r.niche||'其他')):b;const setQ=(p,o)=>history.replaceState(null,'','#'+p+'?'+new URLSearchParams(o));
 let liveP;function live(){return liveP||(liveP=new Promise(r=>{const sc=document.createElement('script');sc.src=document.querySelector('meta[name=live]').content;sc.onload=()=>{D.velocity=window.LIVE.velocity;r()};document.head.append(sc)}))}
 function growth(){seg($('#gtabs'),['3d','5d','10d','15d','30d'].map(k=>[k,k.replace('d',' 日')]),gk,k=>{gk=k;setQ('growth',{d:gk});growth()});
  const b=D.growth.boards?.[gk],d=parseInt(gk);
  if(!b||!b.length){const f=D.growth.first?new Date(D.growth.first):null,el=f?(Date.now()-f)/864e5:0,left=Math.max(1,Math.ceil(d-el));
-  $('#gn').innerHTML='';$('#gcap').textContent='每晚 21:16 记录一次粉丝数，按周期内净增粉丝排序';$('#gbody').innerHTML=pending('数据积累中',`${d} 日涨粉榜需要连续 ${d} 天的粉丝快照，预计 ${left} 天后上线`+(f?`（约 ${new Date(+f+d*864e5).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} 晚间）`:'')+(f?`<br>首次快照：${f.toLocaleDateString('zh-CN')}`:''),el/d*100);return}
- nchips($('#gn'),'growth',b,growth);const bf=nf('growth',b);
+  $('#gnp').hidden=true;$('#gcap').textContent='每晚 21:16 记录一次粉丝数，按周期内净增粉丝排序';$('#gbody').innerHTML=pending('数据积累中',`${d} 日涨粉榜需要连续 ${d} 天的粉丝快照，预计 ${left} 天后上线`+(f?`（约 ${new Date(+f+d*864e5).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} 晚间）`:'')+(f?`<br>首次快照：${f.toLocaleDateString('zh-CN')}`:''),el/d*100);return}
+ $('#gnp').hidden=false;nchips($('#gn'),'growth',b,growth);const bf=nf('growth',b);
  $('#gbody').innerHTML=bf.length?'':pending('该方向暂无上榜博主','换个方向或选“全部”');if(bf.length)$('#gbody').innerHTML=bf.map((r,i)=>`<div class="lr" data-href="${prof(r.handle)}"><span class="rk ${i<3?'t':''}">${i+1}</span>${av(r,'s')}<div class="mid"><div class="nm">${esc(r.name||r.handle)}</div><div class="hl">@${esc(r.handle)} · ${esc(r.niche||'')} · ${fmt(r.followers)} 粉丝</div></div><div class="num"><b>+${fmt(r.gain)}</b><small>${r.pct!=null?r.pct+'%':''}</small></div></div>`).join('')}
 function velocity(){if(!window.LIVE){$('#vbody').innerHTML=pending('加载中…','正在读取最新采样');live().then(velocity);return}seg($('#vtabs'),[['30m','30 分钟'],['1h','1 小时'],['3h','3 小时'],['5h','5 小时']],vk,k=>{vk=k;setQ('velocity',{w:vk,m:vm});velocity()});
  seg($('#vm'),[['views','浏览'],['likes','点赞']],vm,k=>{vm=k;setQ('velocity',{w:vk,m:vm});velocity()});
@@ -79,3 +80,7 @@ const tt=document.createElement('button');tt.className='totop';tt.setAttribute('
 addEventListener('scroll',()=>tt.classList.toggle('show',scrollY>900),{passive:true});
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.matches('[data-href]'))go(e.target.dataset.href)});
 $('#updh').textContent='数据更新于 '+D.meta.updated_at;(window.requestIdleCallback||setTimeout)(()=>live());
+
+document.querySelectorAll('.cw').forEach(w=>{const c=w.querySelector('.chips'),u=()=>{w.classList.toggle('sl',c.scrollLeft>4);w.classList.toggle('sr',c.scrollLeft+c.clientWidth<c.scrollWidth-4)};
+ c.addEventListener('scroll',u,{passive:true});new ResizeObserver(u).observe(c);new MutationObserver(u).observe(c,{childList:true});
+ w.querySelectorAll('.ar').forEach(b=>b.onclick=()=>c.scrollBy({left:b.dataset.d*c.clientWidth*.7,behavior:'smooth'}));u()});
