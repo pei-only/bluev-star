@@ -57,14 +57,23 @@ function growth(){seg($('#gtabs'),['3d','5d','10d','15d','30d'].map(k=>[k,k.repl
   $('#gnp').hidden=true;$('#gcap').textContent='每晚 21:16 记录一次粉丝数，按周期内净增粉丝排序';$('#gbody').innerHTML=pending('数据积累中',`${d} 日涨粉榜需要连续 ${d} 天的粉丝快照，预计 ${left} 天后上线`+(f?`（约 ${new Date(+f+d*864e5).toLocaleDateString('zh-CN',{month:'numeric',day:'numeric'})} 晚间）`:'')+(f?`<br>首次快照：${f.toLocaleDateString('zh-CN')}`:''),el/d*100);return}
  $('#gnp').hidden=false;nchips($('#gn'),'growth',b,growth);const bf=nf('growth',b);
  $('#gbody').innerHTML=bf.length?'':pending('该方向暂无上榜博主','换个方向或选“全部”');if(bf.length)$('#gbody').innerHTML=bf.map((r,i)=>`<div class="lr" data-href="${prof(r.handle)}"><span class="rk ${i<3?'t':''}">${i+1}</span>${av(r,'s')}<div class="mid"><div class="nm">${esc(r.name||r.handle)}</div><div class="hl">@${esc(r.handle)} · ${esc(r.niche||'')} · ${fmt(r.followers)} 粉丝</div></div><div class="num"><b>+${fmt(r.gain)}</b><small>${r.pct!=null?r.pct+'%':''}</small></div></div>`).join('')}
-function velocity(){if(!window.LIVE){$('#vbody').innerHTML=pending('加载中…','正在读取最新采样');live().then(velocity);return}seg($('#vtabs'),[['30m','30 分钟'],['1h','1 小时'],['3h','3 小时'],['5h','5 小时']],vk,k=>{vk=k;setQ('velocity',{w:vk,m:vm});velocity()});
+const VW=[['30m','30 分钟'],['1h','1 小时'],['3h','3 小时'],['5h','5 小时']],VMIN={'30m':30,'1h':60,'3h':180,'5h':300};let vUser=0;
+const vHas=k=>!!(D.velocity.boards?.[k]||[]).length;
+function vEta(k){const e=D.velocity.eta?.[k],f=D.velocity.day_first;let t=e?new Date(e):f?new Date(+new Date(f)+VMIN[k]*6e4):null;if(!t)return '';
+ const hm=t.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Shanghai'}),dk=x=>x.toLocaleDateString('zh-CN',{timeZone:'Asia/Shanghai'});
+ return (dk(t)==dk(new Date())?'':t>new Date()?'明天 ':'')+hm}
+function velocity(){if(!window.LIVE){$('#vbody').innerHTML=pending('加载中…','正在读取最新采样');live().then(velocity);return}
+ if(!vUser&&!vHas(vk)){const f=VW.find(([k])=>vHas(k));if(f)vk=f[0]}
+ seg($('#vtabs'),VW,vk,k=>{vk=k;vUser=1;setQ('velocity',{w:vk,m:vm});velocity()});
+ $('#vtabs').querySelectorAll('button').forEach(x=>{if(!vHas(x.dataset.k)){x.classList.add('em');x.title='数据积累中'+(vEta(x.dataset.k)?'，预计 '+vEta(x.dataset.k)+' 后出榜':'')}});
  seg($('#vm'),[['views','浏览'],['likes','点赞']],vm,k=>{vm=k;setQ('velocity',{w:vk,m:vm});velocity()});
- let b=D.velocity.boards?.[vk];const mins={'30m':30,'1h':60,'3h':180,'5h':300}[vk];
- if(!b||!b.length){const f=D.velocity.first?new Date(D.velocity.first):null,el=f?(Date.now()-f)/6e4:0,left=Math.max(30,mins-el),lab=left>=60?Math.ceil(left/60)+' 小时':Math.ceil(left)+' 分钟';
-  $('#vbody').innerHTML=pending('数据积累中',`需要至少 ${mins>=60?mins/60+' 小时':mins+' 分钟'}的连续采样（每天 9:00–24:00 每半小时一次），预计约 ${lab}采样时段后上线`,el/mins*100);return}
+ let b=D.velocity.boards?.[vk];const mins=VMIN[vk],wl=VW.find(x=>x[0]==vk)[1];
+ if(!b||!b.length){const eta=vEta(vk),f=D.velocity.day_first?new Date(D.velocity.day_first):null,el=f?(Date.now()-f)/6e4:0,alt=VW.filter(([k])=>vHas(k)).map(x=>x[1]);
+  $('#vn').innerHTML='';$('#vcap').textContent=f?`今日首次采样 ${f.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Shanghai'})}（北京时间）· 每天 9:16–23:16 每半小时采样一次`:'';
+  $('#vbody').innerHTML=pending('该时间窗口数据积累中',(eta?`预计 <b>${eta}</b> 后出榜（北京时间）`:'稍后出榜')+`<br>${wl}榜需要当天相隔约 ${wl} 的两次采样，夜间不采样，不会跨夜拼接`+(alt.length?`<br>现在可以先看：${alt.join('、')}榜`:''),Math.min(99,el/mins*100));return}
  nchips($('#vn'),'velocity',b,velocity);const k=vm=='views'?'dviews':'dlikes';b=nf('velocity',[...b]).sort((x,y)=>y[k]-x[k]);if(!b.length){$('#vbody').innerHTML=pending('该方向暂无上榜内容','换个方向或选“全部”');return}
- const lt=D.velocity.latest?new Date(D.velocity.latest).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'';
- $('#vcap').textContent=`按近 ${{'30m':'30 分钟','1h':'1 小时','3h':'3 小时','5h':'5 小时'}[vk]}新增${vm=='views'?'浏览':'点赞'}排序 · 最近采样 ${lt}（北京时间）· 点击帖子看原文，点击头像进主页`;
+ const sp=b.map(r=>r.span).filter(Boolean).sort((x,y)=>x-y),med=sp.length?sp[sp.length>>1]:0;const lt=D.velocity.latest?new Date(D.velocity.latest).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'';
+ $('#vcap').textContent=`按近 ${{'30m':'30 分钟','1h':'1 小时','3h':'3 小时','5h':'5 小时'}[vk]}新增${vm=='views'?'浏览':'点赞'}排序${med&&Math.abs(med-mins)>=5?`（实测间隔 ${med} 分钟）`:''} · 最近采样 ${lt}（北京时间）· 点击帖子看原文，点击头像进主页`;
  $('#vbody').innerHTML=b.map((r,i)=>`<div class="lr post" data-href="https://x.com/${encodeURIComponent(r.handle)}/status/${esc(r.id)}" title="打开原帖" role="link" tabindex="0">
  <div class="ph"><span class="rk ${i<3?'t':''}">${i+1}</span><a class="au" href="${prof(r.handle)}" data-prof="${esc(r.handle)}">${av(r,'xs')}<div style="min-width:0"><div class="nm">${esc(r.name||r.handle)}</div><div class="hl">@${esc(r.handle)}${r.niche?' · '+esc(r.niche):''}</div></div></a>
  <div class="num"><b>+${fmt(r[k])}</b><small>${vm=='views'?'浏览':'点赞'}增量</small></div></div>
@@ -73,7 +82,7 @@ function velocity(){if(!window.LIVE){$('#vbody').innerHTML=pending('加载中…
 // ---------- router
 function route(){const [p0,qs]=(location.hash.slice(1)||'dir').split('?'),p=['dir','growth','velocity'].includes(p0)?p0:'dir',u=new URLSearchParams(qs||'');
  if(p=='dir'&&qs){st.q=u.get('q')||'';$('#q').value=st.q;st.niche=u.get('n')||'全部';st.vt=u.get('v')||'全部';st.sort=u.get('s')||'f';$('#sort').value=st.sort;chips();vts();filt()}
- if(p=='growth'&&u.get('d'))gk=u.get('d');if(p=='velocity'){if(u.get('w'))vk=u.get('w');if(u.get('m'))vm=u.get('m')}['dir','growth','velocity'].forEach(x=>$('#p-'+x).hidden=x!=p);
+ if(p=='growth'&&u.get('d'))gk=u.get('d');if(p=='velocity'){if(u.get('w')&&VMIN[u.get('w')])vk=u.get('w');if(u.get('m'))vm=u.get('m')}['dir','growth','velocity'].forEach(x=>$('#p-'+x).hidden=x!=p);
  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p==p));if(p=='growth')growth();if(p=='velocity')velocity();if(!qs||p!='dir')scrollTo(0,0)}
 addEventListener('hashchange',route);chips();vts();filt();route();ready=1;
 const tt=document.createElement('button');tt.className='totop';tt.setAttribute('aria-label','回到顶部');tt.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></svg>';tt.onclick=()=>scrollTo({top:0,behavior:'smooth'});document.body.append(tt);

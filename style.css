@@ -98,3 +98,5 @@ footer{padding:36px 20px 60px;color:var(--mut);font-size:12.5px;text-align:cente
 .sel select{appearance:none;-webkit-appearance:none;padding:7px 30px 7px 12px;border-radius:12px;background:color-mix(in srgb,var(--fg) 5%,transparent);border:1px solid transparent;font-size:13px;font-weight:550;cursor:pointer}
 .bp{margin-top:14px;padding:10px}
 @media (max-width:640px){.fp{border-radius:18px;padding:10px}.fp .row2{gap:8px}.fp .seg{flex:1;min-width:0}.fp .row2{flex-wrap:wrap}.fp .count{order:3;flex-basis:100%;margin:2px 4px 0}.chips button{padding:7px 12px;font-size:13px}}
+.seg button.em{opacity:.55;position:relative}.seg button.em::after{content:"";position:absolute;top:6px;right:5px;width:5px;height:5px;border-radius:50%;background:var(--mut);opacity:.6}.seg button.em.on{opacity:.85}
+.empty p b{color:var(--acc);font-weight:700}
