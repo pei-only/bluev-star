@@ -69,9 +69,9 @@ function velocity(){if(!window.LIVE){$('#vbody').innerHTML=pending('加载中…
  seg($('#vm'),[['views','浏览'],['likes','点赞']],vm,k=>{vm=k;setQ('velocity',{w:vk,m:vm});velocity()});
  let b=D.velocity.boards?.[vk];const mins=VMIN[vk],wl=VW.find(x=>x[0]==vk)[1];
  if(!b||!b.length){const eta=vEta(vk),f=D.velocity.day_first?new Date(D.velocity.day_first):null,el=f?(Date.now()-f)/6e4:0,alt=VW.filter(([k])=>vHas(k)).map(x=>x[1]);
-  $('#vn').innerHTML='';$('#vcap').textContent=f?`今日首次采样 ${f.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Shanghai'})}（北京时间）· 每天 9:16–23:16 每半小时采样一次`:'';
-  $('#vbody').innerHTML=pending('该时间窗口数据积累中',(eta?`预计 <b>${eta}</b> 后出榜（北京时间）`:'稍后出榜')+`<br>${wl}榜需要当天相隔约 ${wl} 的两次采样，夜间不采样，不会跨夜拼接`+(alt.length?`<br>现在可以先看：${alt.join('、')}榜`:''),Math.min(99,el/mins*100));return}
- nchips($('#vn'),'velocity',b,velocity);const k=vm=='views'?'dviews':'dlikes';b=nf('velocity',[...b]).sort((x,y)=>y[k]-x[k]);if(!b.length){$('#vbody').innerHTML=pending('该方向暂无上榜内容','换个方向或选“全部”');return}
+  $('#vn').innerHTML='';$('#vn').closest('.fp').style.display='none';$('#vcap').textContent=f?`今日首次采样 ${f.toLocaleTimeString('zh-CN',{hour:'2-digit',minute:'2-digit',hour12:false,timeZone:'Asia/Shanghai'})}（北京时间）· 每天 9:16–23:16 每半小时采样一次`:'';
+  $('#vbody').innerHTML=pending('该时间窗口数据积累中',(eta?`预计 <b>${eta}</b> 后出榜（北京时间）`:'稍后出榜')+`<br>${wl}榜需要当天相隔约 ${wl}的两次采样，夜间不采样，不会跨夜拼接`+(alt.length?`<br>现在可以先看：${alt.join('、')}榜`:''),Math.min(99,el/mins*100));return}
+ $('#vn').closest('.fp').style.display='';nchips($('#vn'),'velocity',b,velocity);const k=vm=='views'?'dviews':'dlikes';b=nf('velocity',[...b]).sort((x,y)=>y[k]-x[k]);if(!b.length){$('#vbody').innerHTML=pending('该方向暂无上榜内容','换个方向或选“全部”');return}
  const sp=b.map(r=>r.span).filter(Boolean).sort((x,y)=>x-y),med=sp.length?sp[sp.length>>1]:0;const lt=D.velocity.latest?new Date(D.velocity.latest).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit',hour12:false}):'';
  $('#vcap').textContent=`按近 ${{'30m':'30 分钟','1h':'1 小时','3h':'3 小时','5h':'5 小时'}[vk]}新增${vm=='views'?'浏览':'点赞'}排序${med&&Math.abs(med-mins)>=5?`（实测间隔 ${med} 分钟）`:''} · 最近采样 ${lt}（北京时间）· 点击帖子看原文，点击头像进主页`;
  $('#vbody').innerHTML=b.map((r,i)=>`<div class="lr post" data-href="https://x.com/${encodeURIComponent(r.handle)}/status/${esc(r.id)}" title="打开原帖" role="link" tabindex="0">
