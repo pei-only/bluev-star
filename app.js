@@ -80,7 +80,7 @@ function velocity(){if(!window.LIVE){$('#vbody').innerHTML=pending('加载中…
  <div class="tx">${esc(r.text.replace(/https:\/\/t\.co\/\S+/g,'').trim()||'（图片 / 视频帖）')}</div>
  <div class="st"><span>浏览 ${fmt(r.views)} <b>+${fmt(r.dviews)}</b></span><span>点赞 ${fmt(r.likes)} <b>+${fmt(r.dlikes)}</b></span><span>${r.created_at?new Date(r.created_at).toLocaleString('zh-CN',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):''}</span></div></div>`).join('')}
 // ---------- router
-function route(){const [p0,qs]=(location.hash.slice(1)||'dir').split('?'),p=['dir','growth','velocity'].includes(p0)?p0:'dir',u=new URLSearchParams(qs||'');
+function route(){const [p0,qs]=(location.hash.slice(1)||'dir').split('?'),p=['dir','growth'].includes(p0)?p0:(p0=='velocity'?'growth':'dir'),u=new URLSearchParams(qs||'');
  if(p=='dir'&&qs){st.q=u.get('q')||'';$('#q').value=st.q;st.niche=u.get('n')||'全部';st.vt=u.get('v')||'全部';st.sort=u.get('s')||'f';$('#sort').value=st.sort;chips();vts();filt()}
  if(p=='growth'&&u.get('d'))gk=u.get('d');if(p=='velocity'){if(u.get('w')&&VMIN[u.get('w')])vk=u.get('w');if(u.get('m'))vm=u.get('m')}['dir','growth','velocity'].forEach(x=>$('#p-'+x).hidden=x!=p);
  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.p==p));if(p=='growth')growth();if(p=='velocity')velocity();if(!qs||p!='dir')scrollTo(0,0)}
@@ -88,7 +88,7 @@ addEventListener('hashchange',route);chips();vts();filt();route();ready=1;
 const tt=document.createElement('button');tt.className='totop';tt.setAttribute('aria-label','回到顶部');tt.innerHTML='<svg viewBox="0 0 24 24"><path d="M12 19V5m-6 6 6-6 6 6"/></svg>';tt.onclick=()=>scrollTo({top:0,behavior:'smooth'});document.body.append(tt);
 addEventListener('scroll',()=>tt.classList.toggle('show',scrollY>900),{passive:true});
 document.addEventListener('keydown',e=>{if(e.key=='Enter'&&e.target.matches('[data-href]'))go(e.target.dataset.href)});
-$('#updh').textContent='数据更新于 '+D.meta.updated_at;(window.requestIdleCallback||setTimeout)(()=>live());
+$('#updh').textContent='数据更新于 '+D.meta.updated_at;
 
 document.querySelectorAll('.cw').forEach(w=>{const c=w.querySelector('.chips'),u=()=>{w.classList.toggle('sl',c.scrollLeft>4);w.classList.toggle('sr',c.scrollLeft+c.clientWidth<c.scrollWidth-4)};
  c.addEventListener('scroll',u,{passive:true});new ResizeObserver(u).observe(c);new MutationObserver(u).observe(c,{childList:true});
